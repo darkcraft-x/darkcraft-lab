@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Web Payroll System</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{--bg:#0b0f1a;--surf:#111827;--surf2:#1a2235;--bord:#1e2d45;--acc:#00d4ff;--acc2:#7c3aed;--grn:#10b981;--red:#ef4444;--ylw:#f59e0b;--txt:#e2e8f0;--mut:#64748b;}
+body.light{--bg:#f0f4f8;--surf:#fff;--surf2:#f1f5f9;--bord:#e2e8f0;--acc:#0284c7;--acc2:#7c3aed;--grn:#059669;--red:#dc2626;--ylw:#d97706;--txt:#0f172a;--mut:#64748b;}
+body{background:var(--bg);color:var(--txt);font-family:'Space Grotesk',sans-serif;min-height:100vh;transition:.3s;}
+
+/* ── LOGIN ── */
+#login-page{display:flex;min-height:100vh;align-items:center;justify-content:center;flex-direction:column;background:#2d3748;position:relative;}
+body.light #login-page{background:#3a4a5c;}
+#login-page::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(0,0,0,.15),rgba(0,0,0,.45));z-index:0;}
+.win-box{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:380px;padding:0 20px;}
+.win-top{position:relative;z-index:1;font-size:28px;font-weight:700;color:#fff;text-align:center;letter-spacing:.5px;margin-bottom:22px;text-shadow:0 2px 12px rgba(0,0,0,.4);}
+.win-photo{width:110px;height:110px;border-radius:50%;background:linear-gradient(135deg,#4a5568,#2d3748);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:700;color:#fff;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);position:relative;margin-bottom:18px;}
+.win-photo img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.win-name{font-size:22px;font-weight:700;color:#e8c96d;margin-bottom:4px;text-align:center;}
+.win-sys{font-size:14px;color:rgba(255,255,255,.6);margin-bottom:26px;text-align:center;}
+.win-pass-row{display:flex;align-items:center;width:100%;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:4px;overflow:hidden;transition:.2s;}
+.win-pass-row:focus-within{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.5);}
+.win-pass-inp{flex:1;background:transparent;border:none;padding:12px 16px;color:#fff;font-size:14px;font-family:'Space Grotesk',sans-serif;outline:none;}
+.win-pass-inp::placeholder{color:rgba(255,255,255,.5);}
+.win-pass-btn{background:transparent;border:none;border-left:1px solid rgba(255,255,255,.2);padding:11px 16px;color:rgba(255,255,255,.8);cursor:pointer;font-size:18px;display:flex;align-items:center;}
+.win-pass-btn:hover{background:rgba(255,255,255,.15);color:#fff;}
+.win-err{color:#ff8a8a;font-size:12px;margin-top:10px;text-align:center;min-height:18px;}
+.win-opts{margin-top:18px;font-size:13px;color:rgba(255,255,255,.5);cursor:pointer;}
+.win-bottom{position:absolute;bottom:0;left:0;right:0;padding:16px 28px;display:flex;justify-content:flex-end;z-index:1;}
+.win-theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 13px;font-size:11px;color:rgba(255,255,255,.6);cursor:pointer;font-family:'Space Grotesk',sans-serif;}
+.win-theme-btn:hover{background:rgba(255,255,255,.18);color:#fff;}
+
+/* ── APP ── */
+#app-page{display:none;min-height:100vh;}
+.layout{display:flex;min-height:100vh;}
+.side{width:232px;background:var(--surf);border-right:1px solid var(--bord);display:flex;flex-direction:column;padding:20px 0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:10;}
+.sbrand{padding:0 18px 20px;border-bottom:1px solid var(--bord);margin-bottom:12px;}
+.sbrand-row{display:flex;align-items:center;gap:9px;}
+.sbrand-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--acc2),var(--acc));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.sbrand-name{font-size:13px;font-weight:700;line-height:1.3;}
+.sbrand-ver{font-size:9px;color:var(--mut);font-family:'JetBrains Mono',monospace;margin-top:1px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 18px;font-size:13px;color:var(--mut);cursor:pointer;transition:.13s;border-left:3px solid transparent;user-select:none;}
+.nav-item:hover{color:var(--txt);background:rgba(128,128,128,.05);}
+.nav-item.act{color:var(--acc);background:rgba(0,212,255,.07);border-left-color:var(--acc);}
+.nav-sep{height:1px;background:var(--bord);margin:8px 18px;}
+.nav-lbl{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);padding:6px 18px 2px;font-weight:600;}
+.sfoot{margin-top:auto;padding:12px 18px;border-top:1px solid var(--bord);}
+.uinfo{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+.uavt{width:33px;height:33px;border-radius:50%;background:linear-gradient(135deg,var(--acc2),var(--acc));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;position:relative;}
+.uavt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.unm{font-size:12.5px;font-weight:600;}
+.urol{font-size:10px;color:var(--mut);}
+.main{margin-left:232px;flex:1;overflow-y:auto;min-height:100vh;}
+.topbar{background:var(--surf);border-bottom:1px solid var(--bord);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:5;}
+.ptitle{font-size:18px;font-weight:700;}
+.psub{font-size:11.5px;color:var(--mut);margin-top:2px;}
+.tright{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.cont{padding:22px;}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.scard{background:var(--surf);border:1px solid var(--bord);border-radius:11px;padding:16px;position:relative;overflow:hidden;}
+.scard::before{content:'';position:absolute;top:0;right:0;width:50px;height:50px;border-radius:0 11px 0 50px;opacity:.12;}
+.scard.b::before{background:var(--acc)}.scard.p::before{background:var(--acc2)}.scard.g::before{background:var(--grn)}.scard.y::before{background:var(--ylw)}.scard.r::before{background:var(--red);}
+.slbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);margin-bottom:5px;}
+.sval{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.sval.b{color:var(--acc)}.sval.g{color:var(--grn)}.sval.p{color:var(--acc2)}.sval.y{color:var(--ylw)}.sval.r{color:var(--red);}
+.ssub{font-size:10px;color:var(--mut);margin-top:3px;}
+
+/* CARD/TABLE */
+.card{background:var(--surf);border:1px solid var(--bord);border-radius:11px;overflow:hidden;margin-bottom:16px;}
+.ch{padding:14px 20px;border-bottom:1px solid var(--bord);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.ctit{font-size:13.5px;font-weight:600;}
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{padding:9px 12px;text-align:left;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);background:rgba(128,128,128,.03);border-bottom:1px solid var(--bord);}
+td{padding:11px 12px;font-size:12.5px;border-bottom:1px solid var(--bord);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(128,128,128,.03);}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;}
+.bg{background:rgba(16,185,129,.12);color:var(--grn);}
+.br{background:rgba(239,68,68,.12);color:var(--red);}
+.by{background:rgba(245,158,11,.12);color:var(--ylw);}
+.bb{background:rgba(0,212,255,.1);color:var(--acc);}
+.bp{background:rgba(124,58,237,.12);color:var(--acc2);}
+.acts{display:flex;gap:5px;flex-wrap:wrap;}
+
+/* MODAL */
+.ovl{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;padding:14px;}
+.modal{background:var(--surf);border:1px solid var(--bord);border-radius:15px;width:100%;max-width:600px;max-height:92vh;overflow-y:auto;}
+.modal.lg{max-width:720px;}
+.modal.sm{max-width:420px;}
+.mh{padding:16px 22px;border-bottom:1px solid var(--bord);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surf);z-index:2;}
+.mtit{font-size:14.5px;font-weight:700;}
+.mb{padding:22px;}
+.mf{padding:12px 22px;border-top:1px solid var(--bord);display:flex;gap:8px;justify-content:flex-end;}
+.xbtn{background:none;border:none;color:var(--mut);font-size:22px;cursor:pointer;padding:1px;line-height:1;}
+.xbtn:hover{color:var(--txt);}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fgrid .full{grid-column:1/-1;}
+.slbl2{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--acc);margin-bottom:11px;font-family:'JetBrains Mono',monospace;}
+.div{height:1px;background:var(--bord);margin:14px 0;}
+
+/* FIELDS */
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:10.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--mut);margin-bottom:6px;font-weight:600;}
+.field input,.field select,.field textarea{width:100%;background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:11px 13px;color:var(--txt);font-family:'Space Grotesk',sans-serif;font-size:13.5px;outline:none;transition:.2s;}
+.field input:focus,.field select:focus{border-color:var(--acc);}
+.ro{background:rgba(0,212,255,.05)!important;border-color:rgba(0,212,255,.2)!important;color:var(--acc)!important;cursor:not-allowed;}
+.ro-g{background:rgba(16,185,129,.05)!important;border-color:rgba(16,185,129,.2)!important;color:var(--grn)!important;cursor:not-allowed;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:8px;border:none;font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:600;cursor:pointer;transition:.18s;}
+.btn:hover{opacity:.86;}
+.btn-acc{background:var(--acc);color:#000;}
+.btn-full{width:100%;justify-content:center;padding:13px;font-size:14px;}
+.btn-ghost{background:transparent;color:var(--mut);border:1px solid var(--bord);}
+.btn-ghost:hover{border-color:var(--acc);color:var(--acc);}
+.btn-red{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.btn-grn{background:rgba(16,185,129,.12);color:var(--grn);border:1px solid rgba(16,185,129,.25);}
+.btn-ylw{background:rgba(245,158,11,.12);color:var(--ylw);border:1px solid rgba(245,158,11,.25);}
+.btn-sm{padding:5px 11px;font-size:11px;}
+
+/* PAYSLIP BOX */
+.psbox{background:var(--surf2);border-radius:9px;padding:18px;}
+.prow{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--bord);font-size:12.5px;}
+.prow:last-child{border-bottom:none;}
+.ptot{display:flex;justify-content:space-between;padding:12px 0 0;font-size:15px;font-weight:700;color:var(--grn);}
+
+/* FILTER BAR */
+.fbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.sinp{flex:1;min-width:160px;background:var(--surf);border:1px solid var(--bord);border-radius:8px;padding:9px 13px;color:var(--txt);font-family:'Space Grotesk',sans-serif;font-size:12.5px;outline:none;}
+.sinp:focus{border-color:var(--acc);}
+.dsel{background:var(--surf);border:1px solid var(--bord);border-radius:8px;padding:9px 11px;color:var(--txt);font-size:12.5px;outline:none;cursor:pointer;font-family:'Space Grotesk',sans-serif;}
+.ysel{background:var(--surf2);border:1px solid var(--bord);border-radius:8px;padding:6px 10px;color:var(--acc);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;outline:none;cursor:pointer;}
+
+/* ATTENDANCE CALENDAR */
+.att-cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.att-hdr{text-align:center;font-size:10px;font-weight:700;padding:5px 2px;border-radius:5px;}
+.att-hdr.sun{color:var(--red);}
+.att-hdr.woff{color:var(--ylw);background:rgba(245,158,11,.08);border-radius:5px;}
+.aday{background:var(--surf2);border:1.5px solid var(--bord);border-radius:8px;padding:6px 3px;text-align:center;cursor:pointer;transition:.13s;user-select:none;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.aday:hover{border-color:var(--acc);}
+.aday.sun-day{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.06);}
+.aday.woff-day{border-color:rgba(245,158,11,.35);background:rgba(245,158,11,.07);cursor:not-allowed;}
+.aday.P{border-color:var(--grn);background:rgba(16,185,129,.1);}
+.aday.A{border-color:var(--red);background:rgba(239,68,68,.1);}
+.aday.L{border-color:var(--ylw);background:rgba(245,158,11,.1);}
+.aday.H{border-color:var(--acc2);background:rgba(124,58,237,.1);}
+.aday.future{opacity:.4;cursor:not-allowed;}
+.aday.blank{background:transparent;border-color:transparent;cursor:default;}
+.adnum{font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.adday{font-size:9px;color:var(--mut);}
+.adst{font-size:11px;}
+
+/* LEGEND */
+.leg{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.legi{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--mut);}
+.ldot{width:9px;height:9px;border-radius:50%;}
+
+/* WEEKDAY PICKER */
+.wday-pick{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.wday-btn{padding:5px 10px;border-radius:6px;border:1.5px solid var(--bord);background:var(--surf2);color:var(--mut);font-size:11px;font-weight:600;cursor:pointer;transition:.15s;font-family:'Space Grotesk',sans-serif;}
+.wday-btn.on{background:rgba(245,158,11,.15);border-color:var(--ylw);color:var(--ylw);}
+
+/* MONTHLY ENTRY GRID */
+.month-entry-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.month-entry-card{background:var(--surf2);border:1px solid var(--bord);border-radius:10px;padding:16px;}
+.month-entry-card.done{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05);}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--surf2);border-radius:9px;padding:3px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{padding:6px 13px;border-radius:7px;font-size:11.5px;font-weight:600;cursor:pointer;color:var(--mut);transition:.13s;}
+.tab.act{background:var(--acc);color:#000;}
+.tab:hover:not(.act){color:var(--txt);}
+
+/* PAY BAR */
+.pbar{height:4px;background:var(--bord);border-radius:2px;margin-top:4px;}
+.pbarf{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--acc2),var(--acc));}
+
+/* ADMIN CARD */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.admin-card{background:var(--surf2);border:1px solid var(--bord);border-radius:12px;padding:20px;}
+.admin-card-title{font-size:13px;font-weight:700;margin-bottom:4px;}
+.admin-card-sub{font-size:11.5px;color:var(--mut);margin-bottom:16px;}
+.info-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bord);font-size:12.5px;}
+.info-row:last-child{border-bottom:none;}
+
+/* PHOTO */
+.photo-preview{width:90px;height:90px;border-radius:50%;background:var(--surf2);border:3px solid var(--bord);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;margin:0 auto 14px;cursor:pointer;position:relative;}
+.photo-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.photo-preview:hover{border-color:var(--acc);}
+
+/* DBIND */
+.dbind{font-size:10px;color:var(--grn);font-family:'JetBrains Mono',monospace;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:5px;padding:3px 8px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surf);border:1px solid var(--bord);border-radius:9px;padding:11px 17px;font-size:13px;font-weight:500;z-index:999;box-shadow:0 8px 30px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px;animation:sIn .3s ease;}
+@keyframes sIn{from{transform:translateY(14px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.toast.s{border-color:rgba(16,185,129,.4);color:var(--grn);}
+.toast.e{border-color:rgba(239,68,68,.4);color:var(--red);}
+.toast.w{border-color:rgba(245,158,11,.4);color:var(--ylw);}
+.empty{text-align:center;padding:40px;color:var(--mut);}
+.eico{font-size:36px;margin-bottom:8px;}
+.etxt{font-size:14px;font-weight:600;margin-bottom:4px;}
+.esub{font-size:12px;}
+@media print{.side,.topbar,.acts,.mf,.btn,.toast,.leg,.fbar,.tabs,.dbind,.ysel,.dsel{display:none!important;}.main{margin-left:0;}}
+</style>
+</head>
+<body class="dark">
+
+<!-- LOGIN -->
+<div id="login-page">
+  <div class="win-box">
+    <div class="win-top" id="win-top-title">Web Payroll System</div>
+    <div class="win-photo" id="win-avatar">
+      <span id="win-avatar-initials">A</span>
+      <img id="win-avatar-img" src="" style="display:none;"/>
+    </div>
+    <div class="win-name" id="win-display-name">Administrator</div>
+    <div class="win-sys">Payroll System</div>
+    <div class="win-pass-row">
+      <input class="win-pass-inp" id="lp" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()"/>
+      <button class="win-pass-btn" onclick="doLogin()">→</button>
+    </div>
+    <div class="win-err" id="lerr"></div>
+    <div class="win-opts">Sign-in options</div>
+  </div>
+  <div class="win-bottom">
+    <button class="win-theme-btn" onclick="toggleTheme()" id="thbtn0">☀️ Light</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-page">
+  <div class="layout">
+    <div class="side">
+      <div class="sbrand">
+        <div class="sbrand-row">
+          <div class="sbrand-icon">💼</div>
+          <div>
+            <div class="sbrand-name">Web Payroll System</div>
+            <div class="sbrand-ver">V 6.0 · ENTERPRISE</div>
+          </div>
+        </div>
+      </div>
+      <div class="nav-lbl">Main</div>
+      <div class="nav-item act" onclick="nav('dashboard')" id="nav-dashboard">📊 &nbsp;Dashboard</div>
+      <div class="nav-sep"></div>
+      <div class="nav-lbl">👷 Workers</div>
+      <div class="nav-item" onclick="navType('employees','Worker')" id="nav-employees">👥 &nbsp;Workers</div>
+      <div class="nav-item" onclick="navType('payroll','Worker')" id="nav-payroll">💸 &nbsp;Worker Payroll</div>
+      <div class="nav-item" onclick="navType('attendance','Worker')" id="nav-attendance">📅 &nbsp;Worker Attendance</div>
+      <div class="nav-item" onclick="navType('history','Worker')" id="nav-history">📈 &nbsp;Worker History</div>
+      <div class="nav-sep"></div>
+      <div class="nav-lbl">👔 Staff</div>
+      <div class="nav-item" onclick="navType('employees','Staff')" id="nav-staff-emp">👥 &nbsp;Staff</div>
+      <div class="nav-item" onclick="navType('payroll','Staff')" id="nav-staff-pay">💸 &nbsp;Staff Payroll</div>
+      <div class="nav-item" onclick="navType('attendance','Staff')" id="nav-staff-att">📅 &nbsp;Staff Attendance</div>
+      <div class="nav-item" onclick="navType('history','Staff')" id="nav-staff-hist">📈 &nbsp;Staff History</div>
+      <div class="nav-sep"></div>
+      <div class="nav-lbl">System</div>
+      <div class="nav-item" onclick="nav('reports')" id="nav-reports">📋 &nbsp;Reports</div>
+      <div class="nav-item" onclick="nav('admin')" id="nav-admin">⚙️ &nbsp;Admin Panel</div>
+      <div class="sfoot">
+        <div class="uinfo">
+          <div class="uavt" id="u-avt">A<img id="u-avt-img" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;"/></div>
+          <div><div class="unm" id="u-nm">Administrator</div><div class="urol">Administrator</div></div>
+        </div>
+        <button class="win-theme-btn" style="width:100%;justify-content:center;margin-bottom:8px;display:flex;" onclick="toggleTheme()" id="thbtn1">☀️ Light Mode</button>
+        <button class="btn btn-red btn-sm" style="width:100%;justify-content:center;" onclick="doLogout()">Sign Out</button>
+      </div>
+    </div>
+    <div class="main" id="main-area"></div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast" class="toast s" style="display:none;"></div>
+
+<script>
+// ════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════
+const CFG_USER = "admin";
+const CFG_PASS = "admin123";
+
+// ════════════════════════════════════════════════════
+//  DATABASE — localStorage
+// ════════════════════════════════════════════════════
+const DB = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('wps6_'+k)); }catch(e){ return null; } },
+  set(k,v){ localStorage.setItem('wps6_'+k, JSON.stringify(v)); },
+  save(){
+    ['employees','attendance','monthData','payHistory','settings','profile','creds'].forEach(k=>{
+      DB.set(k, S[k]);
+    });
+  }
+};
+
+// ════════════════════════════════════════════════════
+//  CONSTANTS
+// ════════════════════════════════════════════════════
+const MONTHS   = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DEPTS    = ["All","Engineering","HR","Finance","Operations","Marketing","Sales","Administration","Legal","IT"];
+const ACOLORS  = ["#7c3aed","#0284c7","#059669","#d97706","#dc2626","#0891b2","#9333ea","#16a34a","#b45309","#0369a1"];
+const DOW_LBL  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const WORKER_ROLES = ['Associate'];
+const STAFF_ROLES  = ['Executive','Sr. Executive','Asst. Manager','Manager','CEO','COO','CMO','CFO'];
+const NOW      = new Date();
+const CUR_M    = NOW.getMonth();   // 0-indexed
+const CUR_Y    = NOW.getFullYear();
+const PREV_M   = CUR_M === 0 ? 11 : CUR_M - 1;
+const PREV_Y   = CUR_M === 0 ? CUR_Y - 1 : CUR_Y;
+
+// ════════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════════
+const S = {
+  employees:  DB.get('employees')  || [],
+  attendance: DB.get('attendance') || {},
+  monthData:  DB.get('monthData')  || {}, // per-employee per-month salary config
+  payHistory: DB.get('payHistory') || {},
+  settings:   DB.get('settings')   || {},
+  profile:    DB.get('profile')    || { name:'Administrator', photo:'' },
+  creds:      DB.get('creds')      || { user: CFG_USER, pass: CFG_PASS },
+  // UI state (not persisted)
+  page:       'dashboard',
+  search:     '',
+  deptFilter: 'All',
+  selEmpAtt:  null,
+  attMonth:   MONTHS[CUR_M],
+  attYear:    CUR_Y,
+  histTab:    0,
+  histYear:   CUR_Y,
+  empMonth:   MONTHS[PREV_M],
+  empYear:    PREV_Y,
+  payMonth:   MONTHS[PREV_M],
+  payYear:    PREV_Y,
+  empTab:     'Worker',
+  attTab:     'Worker',
+  histType:   'Worker',
+};
+
+// ════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════
+const ini  = n => String(n||'').split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'?';
+const ac   = id => ACOLORS[(id||0)%ACOLORS.length];
+const fmt  = n => '₹'+Math.round(n||0).toLocaleString('en-IN');
+const esc  = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const mIdx = m => MONTHS.indexOf(m);
+
+// Is a given month/year in the past or current? (not future)
+function isCompletedOrCurrent(month, year){
+  const mi = mIdx(month);
+  return year < CUR_Y || (year === CUR_Y && mi <= CUR_M);
+}
+
+// Get days in month with correct weekdays
+function daysInMonth(month, year){
+  const mi = mIdx(month);
+  const total = new Date(year, mi+1, 0).getDate();
+  const out = [];
+  for(let d=1;d<=total;d++) out.push({d, dow: new Date(year,mi,d).getDay()});
+  return out;
+}
+
+// Employee's weekly off days (array of dow 0-6)
+function getWeeklyOff(emp){
+  return emp.weeklyOff || [0]; // default Sunday only
+}
+
+// Is a day a designated weekly off (NOT Sunday — Sunday is always markable)
+function isWeeklyOff(dow, emp){
+  const wo = getWeeklyOff(emp);
+  // Sunday (0) is highlighted red but always markable — not a hard WO
+  return wo.includes(dow) && dow !== 0;
+}
+
+// ── GOVT DEDUCTION RULES ──
+// Worker: PF = 12% of (wagesPerDay × daysWorked), ESIC = 0.75% if totalGross ≤ 21000
+// Staff:  Same PF/ESIC rules, payDays = 30 (calendar month days)
+function calcDeductions(wagesPerDay, allowances, overtime, workingDays){
+  const grossWage  = Math.round((wagesPerDay||0) * (workingDays||0));
+  const totalGross = grossWage + (allowances||0) + (overtime||0);
+  const pf   = Math.round(grossWage * 0.12);
+  const esic = totalGross <= 21000 ? Math.round(totalGross * 0.0075) : 0;
+  return { pf, esic, total: pf+esic, grossWage, totalGross };
+}
+
+// Pay days for an employee type and month
+function getPayDays(emp, monthName, year){
+  if((emp.empType||'Worker')==='Staff'){
+    // Staff: full calendar month days
+    return new Date(year, mIdx(monthName)+1, 0).getDate();
+  }
+  // Worker: actual days Present + Holiday in attendance
+  const att = getAttData(emp.id, monthName, year);
+  return att.filter(d => d.s === 'P' || d.s === 'H').length;
+}
+
+// Net pay calculation
+function calcNetPay(emp, monthName, year){
+  const cfg      = getMonthCfg(emp, monthName, year);
+  const payDays  = getPayDays(emp, monthName, year);
+  const isStaff  = (emp.empType||'Worker') === 'Staff';
+  const { pf, esic, grossWage, totalGross } = calcDeductions(
+    cfg.wagesPerDay, cfg.allowances, cfg.overtime, payDays
+  );
+  const bonus = isStaff ? 0 : (cfg.bonus || 0); // Staff has no bonus
+  const net   = grossWage + (cfg.allowances||0) + (cfg.overtime||0) + bonus - pf - esic;
+  return {
+    daysWorked: payDays, grossWage, allowances: cfg.allowances||0,
+    overtime: cfg.overtime||0, bonus, pf, esic,
+    totalDeduct: pf+esic, net, totalGross, wagesPerDay: cfg.wagesPerDay||0,
+    isStaff
+  };
+}
+
+// ── MONTH CONFIG per employee ──
+function monthCfgKey(empId, month, year){ return `MC_${empId}_${month}_${year}`; }
+
+function getMonthCfg(emp, month, year){
+  const k = monthCfgKey(emp.id, month, year);
+  return S.monthData[k] || {
+    wagesPerDay: emp.wagesPerDay || 0,
+    allowances:  emp.allowances  || 0,
+    overtime:    emp.overtime    || 0,
+    bonus:       emp.bonus       || 0,
+  };
+}
+
+function saveMonthCfg(empId, month, year, cfg){
+  const k = monthCfgKey(empId, month, year);
+  S.monthData[k] = cfg;
+  DB.save();
+}
+
+// ── ATTENDANCE per employee per month ──
+function attKey(empId, month, year){ return `ATT_${empId}_${month}_${year}`; }
+
+function getAttData(empId, month, year){
+  const k   = attKey(empId, month, year);
+  if(S.attendance[k]) return S.attendance[k];
+  const emp  = S.employees.find(e=>e.id===empId);
+  const days = daysInMonth(month, year);
+  const now  = new Date();
+  S.attendance[k] = days.map(({d,dow})=>{
+    const isHardOff = emp ? isWeeklyOff(dow, emp) : false; // non-Sunday weekly off
+    const isSun     = dow === 0;
+    const dt        = new Date(year, mIdx(month), d);
+    const future    = dt > now;
+    let s;
+    if(isHardOff) s = 'WO';           // Designated weekly off (non-Sunday)
+    else if(future) s = 'U';          // Future
+    else if(isSun) s = 'H';           // Sunday defaults to Holiday (markable)
+    else s = 'P';                     // Weekdays default Present
+    return {d, dow, s};
+  });
+  DB.save();
+  return S.attendance[k];
+}
+
+function cycleAtt(empId, month, year, idx){
+  const k   = attKey(empId, month, year);
+  const att = getAttData(empId, month, year);
+  const d   = att[idx];
+  // Hard weekly off (non-Sunday) cannot be changed
+  if(d.s === 'WO') return;
+  const dt  = new Date(year, mIdx(month), d.d);
+  if(dt > new Date()) return; // future
+  const emp     = S.employees.find(e=>e.id===empId);
+  const isStaff = emp && (emp.empType||'Worker') === 'Staff';
+  const isSun   = d.dow === 0;
+  // Staff weekly off day cycles include 'Rest'
+  const isStaffWO = emp && getWeeklyOff(emp).includes(d.dow);
+  let cycle;
+  if(isStaff && isStaffWO) cycle = ['Rest','P','A','L','H']; // Staff weekly off: Rest/See-off
+  else if(isSun)           cycle = ['H','P','A','L'];         // Sunday: H first
+  else                     cycle = ['P','A','L','H'];          // Normal weekday
+  const cur = cycle.indexOf(d.s);
+  att[idx].s = cycle[cur < 0 ? 0 : (cur+1)%cycle.length];
+  S.attendance[k] = att;
+  DB.save(); render();
+}
+
+function attCount(empId, month, year, status){
+  return getAttData(empId, month, year).filter(d=>d.s===status).length;
+}
+
+// ════════════════════════════════════════════════════
+//  THEME
+// ════════════════════════════════════════════════════
+function applyTheme(){
+  document.body.className = S.settings.theme || 'dark';
+  const lbl = (S.settings.theme||'dark')==='dark' ? '☀️ Light' : '🌙 Dark';
+  ['thbtn0','thbtn1'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=lbl;});
+}
+function toggleTheme(){
+  S.settings.theme = (S.settings.theme||'dark')==='dark' ? 'light' : 'dark';
+  DB.save(); applyTheme();
+}
+
+// ════════════════════════════════════════════════════
+//  LOGIN PROFILE UPDATE
+// ════════════════════════════════════════════════════
+function updateLoginProfile(){
+  const nm = S.profile.name || 'Administrator';
+  const el1 = document.getElementById('win-display-name');
+  const el2 = document.getElementById('win-avatar-initials');
+  const el3 = document.getElementById('win-avatar-img');
+  if(el1) el1.textContent = nm;
+  if(el2) el2.textContent = nm[0].toUpperCase();
+  if(el3){
+    if(S.profile.photo){ el3.src=S.profile.photo; el3.style.display='block'; if(el2) el2.style.display='none'; }
+    else { el3.style.display='none'; if(el2) el2.style.display='block'; }
+  }
+}
+
+// ════════════════════════════════════════════════════
+//  LOGIN / LOGOUT
+// ════════════════════════════════════════════════════
+function doLogin(){
+  const p = document.getElementById('lp').value;
+  if(p === S.creds.pass){
+    document.getElementById('login-page').style.display='none';
+    document.getElementById('app-page').style.display='block';
+    const nm=document.getElementById('u-nm');
+    const av=document.getElementById('u-avt');
+    const avI=document.getElementById('u-avt-img');
+    if(nm) nm.textContent=S.profile.name||S.creds.user;
+    if(av) av.textContent=(S.profile.name||S.creds.user)[0].toUpperCase();
+    if(avI&&S.profile.photo){avI.src=S.profile.photo;avI.style.display='block';if(av)av.style.fontSize='0';}
+    applyTheme(); render();
+  } else {
+    document.getElementById('lerr').textContent = p ? 'Incorrect password. Try again.' : 'Please enter password.';
+  }
+}
+function doLogout(){
+  document.getElementById('login-page').style.display='flex';
+  document.getElementById('app-page').style.display='none';
+  document.getElementById('lp').value='';
+  document.getElementById('lerr').textContent='';
+  updateLoginProfile();
+}
+
+// ════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════
+function navType(pg, type){
+  S.empTab   = type;
+  S.attTab   = type;
+  S.histType = type;
+  nav(pg);
+}
+
+function nav(pg){
+  S.page=pg; S.search=''; S.deptFilter='All';
+  const allNavIds = ['dashboard','employees','payroll','attendance','history','reports','admin',
+                     'staff-emp','staff-pay','staff-att','staff-hist'];
+  allNavIds.forEach(id=>{
+    const el=document.getElementById('nav-'+id);
+    if(el) el.className='nav-item';
+  });
+  // Highlight correct nav item based on page + type
+  const type = S.empTab || 'Worker';
+  const isStaff = type === 'Staff';
+  const idMap = {
+    dashboard: 'nav-dashboard',
+    employees: isStaff ? 'nav-staff-emp' : 'nav-employees',
+    payroll:   isStaff ? 'nav-staff-pay' : 'nav-payroll',
+    attendance:isStaff ? 'nav-staff-att' : 'nav-attendance',
+    history:   isStaff ? 'nav-staff-hist': 'nav-history',
+    reports:   'nav-reports',
+    admin:     'nav-admin',
+  };
+  const activeId = idMap[pg];
+  if(activeId){ const el=document.getElementById(activeId); if(el) el.className='nav-item act'; }
+  render();
+}
+
+function render(){
+  const pages={dashboard:pageDashboard,employees:pageEmployees,payroll:pagePayroll,
+               attendance:pageAttendance,history:pageHistory,reports:pageReports,admin:pageAdmin};
+  document.getElementById('main-area').innerHTML=(pages[S.page]||pageDashboard)();
+}
+
+// ════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════
+let _t;
+function toast(msg,type='s'){
+  const el=document.getElementById('toast');
+  el.textContent=(type==='s'?'✓  ':type==='e'?'✕  ':'⚠  ')+msg;
+  el.className='toast '+type; el.style.display='flex';
+  clearTimeout(_t); _t=setTimeout(()=>el.style.display='none',3000);
+}
+
+// ════════════════════════════════════════════════════
+//  UI HELPERS
+// ════════════════════════════════════════════════════
+function modal(html){ document.getElementById('modal-root').innerHTML=html; }
+function closeModal(){ document.getElementById('modal-root').innerHTML=''; }
+
+function emptyState(icon,title,sub,btnLbl,btnAct){
+  return `<div class="empty"><div class="eico">${icon}</div><div class="etxt">${title}</div><div class="esub">${sub}</div>${btnLbl?`<br><br><button class="btn btn-acc" onclick="${btnAct}">${btnLbl}</button>`:''}</div>`;
+}
+
+function monthSel(stateKey, onchange, showFuture=false){
+  const cur = S[stateKey];
+  const opts = MONTHS
+    .filter(m => showFuture ? true : isCompletedOrCurrent(m, S[stateKey+'Year']||S.attYear||CUR_Y))
+    .map(m=>`<option${m===cur?' selected':''}>${m}</option>`).join('');
+  // show all for simplicity in picker, filter on display
+  return `<select class="dsel" onchange="${onchange}">${MONTHS.map(m=>`<option${m===cur?' selected':''}>${m}</option>`).join('')}</select>`;
+}
+
+function yearSel(stateKey, onchange){
+  const cur = S[stateKey] || CUR_Y;
+  const years = [];
+  for(let y = 2024; y <= CUR_Y + 1; y++) years.push(y);
+  return `<select class="ysel" onchange="${onchange}">${years.map(y=>`<option${y===cur?' selected':''}>${y}</option>`).join('')}</select>`;
+}
+
+function deptPicker(){
+  return `<select class="dsel" onchange="S.deptFilter=this.value;render()">${DEPTS.map(d=>`<option${d===S.deptFilter?' selected':''}>${d}</option>`).join('')}</select>`;
+}
+
+// ════════════════════════════════════════════════════
+//  PAGES
+// ════════════════════════════════════════════════════
+
+// ── DASHBOARD ──
+function pageDashboard(){
+  const ae = S.employees.filter(e=>e.status==='Active');
+  if(!ae.length) return `
+  <div class="topbar"><div><div class="ptitle">Dashboard</div><div class="psub">Payroll overview</div></div><div class="tright"><span class="dbind">💾 localStorage</span></div></div>
+  <div class="cont">${emptyState('👋','Welcome to Web Payroll System','Add your first employee to get started.','Add Employee',"nav('employees')")}</div>`;
+
+  // Last completed month stats
+  const lm = MONTHS[PREV_M], ly = PREV_Y;
+  const lastPay  = ae.reduce((s,e)=>s+calcNetPay(e,lm,ly).net,0);
+  const curPay   = ae.reduce((s,e)=>s+calcNetPay(e,MONTHS[CUR_M],CUR_Y).net,0);
+  const avgWages = Math.round(ae.reduce((s,e)=>s+(e.wagesPerDay||0),0)/ae.length);
+
+  const dRows = ["Engineering","HR","Finance","Operations","Marketing","Sales","Administration","IT","Legal"].map(dept=>{
+    const de=ae.filter(e=>e.dept===dept); if(!de.length) return '';
+    const tn=de.reduce((s,e)=>s+calcNetPay(e,lm,ly).net,0);
+    return `<tr><td><span class="badge bb">${dept}</span></td><td style="font-family:'JetBrains Mono',monospace">${de.length}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--ylw)">${fmt(Math.round(de.reduce((s,e)=>s+(e.wagesPerDay||0),0)/de.length))}/day</td><td style="font-family:'JetBrains Mono',monospace;color:var(--grn);font-weight:600">${fmt(tn)}</td></tr>`;
+  }).join('');
+
+  const topRows=[...ae].sort((a,b)=>calcNetPay(b,lm,ly).net-calcNetPay(a,lm,ly).net).slice(0,6).map(e=>{
+    const r=calcNetPay(e,lm,ly);
+    return `<tr><td><div style="display:flex;align-items:center;gap:8px"><div class="avt" style="width:28px;height:28px;font-size:10px;background:${ac(e.id)};border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;flex-shrink:0">${ini(e.name)}</div><div><div style="font-weight:600;font-size:12px">${esc(e.name)}</div><div style="font-size:10px;color:var(--mut)">${esc(e.empId)}</div></div></div></td>
+    <td style="font-size:11px">${esc(e.dept)}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${fmt(e.wagesPerDay||0)}/day</td>
+    <td style="font-family:'JetBrains Mono',monospace">${r.daysWorked} days</td>
+    <td><div style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--grn)">${fmt(r.net)}</div><div class="pbar"><div class="pbarf" style="width:${Math.min(100,(r.net/80000)*100)}%"></div></div></td></tr>`;
+  }).join('');
+
+  return `
+  <div class="topbar"><div><div class="ptitle">Dashboard</div><div class="psub">Payroll overview · Last month: ${lm} ${ly}</div></div><div class="tright"><span class="dbind">💾 Auto-saved</span></div></div>
+  <div class="cont">
+  <div class="sgrid">
+    <div class="scard b"><div class="slbl">Last Month Payroll</div><div class="sval b">${fmt(lastPay)}</div><div class="ssub">${lm} ${ly} · ${ae.length} active</div></div>
+    <div class="scard g"><div class="slbl">Current Month Est.</div><div class="sval g">${fmt(curPay)}</div><div class="ssub">${MONTHS[CUR_M]} ${CUR_Y}</div></div>
+    <div class="scard p"><div class="slbl">Employees</div><div class="sval p">${S.employees.length}</div><div class="ssub">${ae.length} active · ${S.employees.length-ae.length} inactive</div></div>
+    <div class="scard y"><div class="slbl">Avg Daily Wage</div><div class="sval y">${fmt(avgWages)}</div><div class="ssub">Per active employee</div></div>
+  </div>
+  ${dRows?`<div class="card"><div class="ch"><div class="ctit">Department Summary — ${lm} ${ly}</div></div><div class="tw"><table><thead><tr><th>Department</th><th>Staff</th><th>Avg Wage</th><th>Net Payroll</th></tr></thead><tbody>${dRows}</tbody></table></div></div>`:''}
+  <div class="card"><div class="ch"><div class="ctit">Top Earners — ${lm} ${ly}</div><button class="btn btn-ghost btn-sm" onclick="nav('employees')">All →</button></div><div class="tw"><table><thead><tr><th>Employee</th><th>Dept</th><th>Wage</th><th>Days</th><th>Net Pay</th></tr></thead><tbody>${topRows}</tbody></table></div></div>
+  </div>`;
+}
+
+// ── EMPLOYEES ──
+function pageEmployees(){
+  const empM   = S.empMonth || MONTHS[PREV_M];
+  const empY   = S.empYear  || PREV_Y;
+  const type   = S.empTab   || 'Worker';
+  const isStaff= type === 'Staff';
+  const fil    = S.employees.filter(e=>
+    (e.empType||'Worker') === type &&
+    (S.deptFilter==='All' || e.dept===S.deptFilter) &&
+    (e.name.toLowerCase().includes(S.search.toLowerCase()) ||
+     e.empId.toLowerCase().includes(S.search.toLowerCase()) ||
+     e.role.toLowerCase().includes(S.search.toLowerCase()))
+  );
+
+  const rows = fil.length ? fil.map(e=>{
+    const r = calcNetPay(e, empM, empY);
+    return `<tr>
+    <td><div style="display:flex;align-items:center;gap:8px">
+      <div style="width:28px;height:28px;border-radius:50%;background:${ac(e.id)};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0">${ini(e.name)}</div>
+      <div><div style="font-weight:600">${esc(e.name)}</div><div style="font-size:10px;color:var(--mut);font-family:'JetBrains Mono',monospace">${esc(e.empId)}</div></div>
+    </div></td>
+    <td><span class="badge bb">${esc(e.dept)}</span></td>
+    <td style="color:var(--mut);font-size:11px">${esc(e.role)}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${fmt(e.wagesPerDay||0)}<div style="font-size:9px;color:var(--mut)">per day</div></td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--acc)">${r.daysWorked} days<div style="font-size:9px;color:var(--mut)">${empM.slice(0,3)} ${empY}</div></td>
+    ${!isStaff ? `<td style="font-family:'JetBrains Mono',monospace;color:var(--ylw)">${fmt(r.bonus)}</td>` : ''}
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--grn);font-weight:600">${fmt(r.net)}<div style="font-size:9px;color:var(--mut)">${empM.slice(0,3)} ${empY}</div></td>
+    <td><span class="badge ${e.status==='Active'?'bg':'br'}">${esc(e.status)}</span></td>
+    <td><div class="acts">
+      <button class="btn btn-ghost btn-sm" onclick="showProfile(${e.id})">Profile</button>
+      <button class="btn btn-ghost btn-sm" onclick="showPayslip(${e.id},'${empM}',${empY})">Slip</button>
+      <button class="btn btn-ylw btn-sm" onclick="gotoAtt(${e.id})">Att</button>
+      <button class="btn btn-grn btn-sm" onclick="openEdit(${e.id})">Edit</button>
+      <button class="btn btn-red btn-sm" onclick="openDel(${e.id})">Del</button>
+    </div></td></tr>`;
+  }).join('') : `<tr><td colspan="9">${emptyState('🔍','No ${type}s found','Add one using the button above.')}</td></tr>`;
+
+  const typeIcon = isStaff ? '👔' : '👷';
+  const total    = S.employees.filter(e=>(e.empType||'Worker')===type).length;
+  const active   = S.employees.filter(e=>(e.empType||'Worker')===type && e.status==='Active').length;
+
+  return `
+  <div class="topbar">
+    <div><div class="ptitle">${typeIcon} ${type}s</div><div class="psub">${total} total · ${active} active</div></div>
+    <button class="btn btn-acc" onclick="openAdd()">+ Add ${type}</button>
+  </div>
+  <div class="cont">
+  ${!fil.length && !S.employees.filter(e=>(e.empType||'Worker')===type).length ?
+    emptyState(`${typeIcon}`,'No ${type}s yet',`Add your first ${type}.`) : `
+  <div class="fbar">
+    <input class="sinp" placeholder="🔍 Search name, ID, role..." value="${esc(S.search)}" oninput="S.search=this.value;render()"/>
+    ${deptPicker()}
+    <select class="dsel" onchange="S.empMonth=this.value;render()">${MONTHS.filter(m=>isCompletedOrCurrent(m,empY)).map(m=>`<option${m===empM?' selected':''}>${m}</option>`).join('')}</select>
+    ${yearSel('empYear',"S.empYear=parseInt(this.value);render()")}
+  </div>
+  <div class="card">
+    <div class="ch">
+      <div class="ctit">${typeIcon} ${type} Records — ${empM} ${empY} (${fil.length})</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge ${isStaff?'bp':'by'}">${isStaff?'Staff · 30 days':'Worker · Att. based'}</span>
+        <span class="dbind">💾 Auto-saved</span>
+      </div>
+    </div>
+    <div class="tw"><table><thead><tr>
+      <th>Employee</th><th>Dept</th><th>Role</th><th>Daily Wage</th>
+      <th>${isStaff?'Pay Days (30)':'Days Present'}</th>
+      ${!isStaff?'<th>Bonus</th>':''}
+      <th>Net Pay</th><th>Status</th><th>Actions</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>
+  </div>`}
+  </div>`;
+}
+
+// ── PAYROLL ──
+function pagePayroll(){
+  const pm     = S.payMonth || MONTHS[PREV_M];
+  const py     = S.payYear  || PREV_Y;
+  const type   = S.empTab   || 'Worker';
+  const isStaff= type === 'Staff';
+  const emps   = S.employees.filter(e=>(e.empType||'Worker')===type);
+  if(!emps.length) return `
+  <div class="topbar"><div><div class="ptitle">${isStaff?'👔':'👷'} ${type} Payroll</div><div class="psub">Monthly payroll register</div></div></div>
+  <div class="cont">${emptyState('💸',`No ${type}s`,`Add ${type}s first.`)}</div>`;
+
+  const rows = emps.map(e=>{
+    const r = calcNetPay(e, pm, py);
+    return `<tr>
+    <td><div style="font-weight:600">${esc(e.name)}</div><div style="font-size:10px;color:var(--mut)">${esc(e.dept)}</div></td>
+    <td style="font-family:'JetBrains Mono',monospace">${fmt(e.wagesPerDay||0)}/day</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--acc)">${r.daysWorked}</td>
+    <td style="font-family:'JetBrains Mono',monospace">${fmt(r.grossWage)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--acc)">+${fmt(r.allowances)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--ylw)">+${fmt(r.overtime)}</td>
+    ${!isStaff?`<td style="font-family:'JetBrains Mono',monospace;color:var(--grn)">+${fmt(r.bonus)}</td>`:''}
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--red)">PF:${fmt(r.pf)} ESIC:${fmt(r.esic)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--grn)">${fmt(r.net)}</td>
+    <td><div style="display:flex;gap:4px">
+      <button class="btn btn-ghost btn-sm" onclick="showPayslip(${e.id},'${pm}',${py})">Slip</button>
+      <button class="btn btn-grn btn-sm" onclick="openMonthEntry(${e.id},'${pm}',${py})">⚙️</button>
+    </div></td></tr>`;
+  }).join('');
+
+  const total = emps.reduce((s,e)=>s+calcNetPay(e,pm,py).net,0);
+  const typeIcon = isStaff ? '👔' : '👷';
+
+  return `
+  <div class="topbar">
+    <div><div class="ptitle">${typeIcon} ${type} Payroll Register</div><div class="psub">${pm} ${py} · ${isStaff?'30 days fixed':'Attendance based'}</div></div>
+    <div class="tright">
+      <select class="dsel" onchange="S.payMonth=this.value;render()">${MONTHS.filter(m=>isCompletedOrCurrent(m,py)).map(m=>`<option${m===pm?' selected':''}>${m}</option>`).join('')}</select>
+      ${yearSel('payYear',"S.payYear=parseInt(this.value);render()")}
+    </div>
+  </div>
+  <div class="cont"><div class="card">
+    <div class="ch">
+      <div class="ctit">${typeIcon} ${type}s — ${pm} ${py}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--grn)">${fmt(total)}</div>
+    </div>
+    <div class="tw"><table><thead><tr>
+      <th>Employee</th><th>Wage/Day</th><th>Days</th><th>Gross</th>
+      <th>Allow</th><th>OT</th>${!isStaff?'<th>Bonus</th>':''}
+      <th>PF+ESIC</th><th>Net Pay</th><th>Actions</th>
+    </tr></thead><tbody>${rows}</tbody></table></div>
+  </div></div>`;
+}
+
+// ── ATTENDANCE ──
+function pageAttendance(){
+  const am   = S.attMonth, ay = S.attYear;
+  const type = S.attTab || 'Worker';
+  const typeIcon = type==='Staff'?'👔':'👷';
+  const typeEmps = S.employees.filter(e=>(e.empType||'Worker')===type);
+
+  if(!S.selEmpAtt){
+    if(!typeEmps.length) return `
+    <div class="topbar"><div><div class="ptitle">${typeIcon} ${type} Attendance</div></div>
+    <div class="tright"><select class="dsel" onchange="S.attMonth=this.value;render()">${MONTHS.map(m=>`<option${m===am?' selected':''}>${m}</option>`).join('')}</select>${yearSel('attYear',"S.attYear=parseInt(this.value);render()")}</div></div>
+    <div class="cont">${emptyState('📅',`No ${type}s`,`Add ${type}s first.`)}</div>`;
+
+    const rows = typeEmps.map(e=>{
+      const P=attCount(e.id,am,ay,'P'), A=attCount(e.id,am,ay,'A'),
+            L=attCount(e.id,am,ay,'L'), H=attCount(e.id,am,ay,'H'),
+            R=attCount(e.id,am,ay,'Rest');
+      return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div style="width:26px;height:26px;border-radius:50%;background:${ac(e.id)};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0">${ini(e.name)}</div>
+        <div><div style="font-weight:600">${esc(e.name)}</div><div style="font-size:9px;color:var(--mut)">${esc(e.empId)}</div></div>
+      </div></td>
+      <td style="font-size:11px">${esc(e.dept)}</td>
+      <td style="font-size:10px;color:var(--mut)">${(e.weeklyOff||[0]).map(d=>DOW_LBL[d]).join(', ')}</td>
+      <td><span class="badge bg">${P}</span></td>
+      <td><span class="badge br">${A}</span></td>
+      <td><span class="badge by">${L}</span></td>
+      <td><span class="badge bp">${H}</span></td>
+      ${type==='Staff'?`<td><span class="badge" style="background:rgba(100,116,139,.12);color:var(--mut)">${R}</span></td>`:''}
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--grn);font-weight:600">${fmt(calcNetPay(e,am,ay).net)}</td>
+      <td><button class="btn btn-acc btn-sm" onclick="gotoAtt(${e.id})">Mark →</button></td></tr>`;
+    }).join('');
+
+    return `
+    <div class="topbar">
+      <div><div class="ptitle">${typeIcon} ${type} Attendance</div><div class="psub">Select employee · ${am} ${ay}</div></div>
+      <div class="tright">
+        <select class="dsel" onchange="S.attMonth=this.value;render()">${MONTHS.map(m=>`<option${m===am?' selected':''}>${m}</option>`).join('')}</select>
+        ${yearSel('attYear',"S.attYear=parseInt(this.value);render()")}
+      </div>
+    </div>
+    <div class="cont"><div class="card"><div class="ch"><div class="ctit">${typeIcon} ${type}s — ${am} ${ay}</div></div>
+    <div class="tw"><table><thead><tr>
+      <th>Employee</th><th>Dept</th><th>Weekly Off</th>
+      <th>Present</th><th>Absent</th><th>Leave</th><th>Holiday</th>
+      ${type==='Staff'?'<th>Rest</th>':''}
+      <th>Net Pay</th><th>Action</th>
+    </tr></thead><tbody>${rows}</tbody></table></div></div></div>`;
+  }
+
+  const e = S.employees.find(x=>x.id===S.selEmpAtt);
+  if(!e){S.selEmpAtt=null;return pageAttendance();}
+
+  const att       = getAttData(e.id, am, ay);
+  const days      = daysInMonth(am, ay);
+  const weeklyOff = getWeeklyOff(e);
+  const isStaff   = (e.empType||'Worker')==='Staff';
+  const firstDow  = days.length ? days[0].dow : 0;
+
+  const blankCells = Array(firstDow).fill(null);
+  const allCells   = [...blankCells, ...att];
+
+  // Header row — mark non-Sun weekly offs
+  const hdrs = DOW_LBL.map((d,i)=>{
+    const isSun    = i===0;
+    const isHardOff= weeklyOff.includes(i) && !isSun;
+    return `<div class="att-hdr${isSun?' sun':''}${isHardOff?' woff':''}">${d}${isHardOff?' 🔴':''}</div>`;
+  }).join('');
+
+  const ICO = {P:'✅',A:'❌',L:'🏖️',H:'🎉',WO:'🔴',Rest:'😴',U:'⏳'};
+
+  const cells = allCells.map((cell,i)=>{
+    if(!cell) return `<div class="aday blank"></div>`;
+    const idx       = i - firstDow;
+    const isSun     = cell.dow === 0;
+    const isHardOff = isWeeklyOff(cell.dow, e);
+    const dt        = new Date(ay, mIdx(am), cell.d);
+    const isFut     = dt > new Date();
+
+    let cls = 'aday';
+    if(isHardOff)                          cls += ' woff-day';
+    else if(isSun)                         cls += ' sun-day';
+    if(['P','A','L','H'].includes(cell.s)) cls += ' '+cell.s;
+    if(cell.s==='Rest')                    cls += ' woff-day';
+    if(isFut && !isHardOff)               cls += ' future';
+
+    const clickFn = (!isHardOff && !isFut) ? `cycleAtt(${e.id},'${am}',${ay},${idx})` : '';
+    return `<div class="${cls}" onclick="${clickFn}" title="${DOW_LBL[cell.dow]} — ${cell.s}">
+      <div class="adnum" style="${isSun?'color:var(--red)':isHardOff?'color:var(--ylw)':''}">${cell.d}</div>
+      <div class="adday">${DOW_LBL[cell.dow]}</div>
+      <div class="adst">${ICO[cell.s]||'⏳'}</div>
+    </div>`;
+  }).join('');
+
+  const P=attCount(e.id,am,ay,'P'), A=attCount(e.id,am,ay,'A'),
+        L=attCount(e.id,am,ay,'L'), H=attCount(e.id,am,ay,'H'),
+        R=attCount(e.id,am,ay,'Rest');
+  const r = calcNetPay(e, am, ay);
+
+  return `
+  <div class="topbar">
+    <div><div class="ptitle">${esc(e.name)}</div><div class="psub">${esc(e.dept)} · ${esc(e.empId)} · ${isStaff?'👔 Staff':'👷 Worker'}</div></div>
+    <div class="tright">
+      <select class="dsel" onchange="S.attMonth=this.value;render()">${MONTHS.map(m=>`<option${m===am?' selected':''}>${m}</option>`).join('')}</select>
+      ${yearSel('attYear',"S.attYear=parseInt(this.value);render()")}
+      <button class="btn btn-ghost btn-sm" onclick="S.selEmpAtt=null;render()">← Back</button>
+    </div>
+  </div>
+  <div class="cont">
+  <div style="background:var(--surf2);border-radius:10px;padding:14px 18px;display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+    <div style="width:46px;height:46px;border-radius:50%;background:${ac(e.id)};display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;border:3px solid var(--acc);flex-shrink:0">${ini(e.name)}</div>
+    <div>
+      <div style="font-size:15px;font-weight:700">${esc(e.name)}</div>
+      <div style="color:var(--mut);font-size:11px;margin-top:1px">${esc(e.role)} · Weekly Off: ${weeklyOff.map(d=>DOW_LBL[d]).join(', ')}</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-left:auto;align-items:center">
+      <span class="badge bg">✅ ${P} Present</span>
+      <span class="badge br">❌ ${A} Absent</span>
+      <span class="badge by">🏖️ ${L} Leave</span>
+      <span class="badge bp">🎉 ${H} Holiday</span>
+      ${isStaff?`<span class="badge" style="background:rgba(100,116,139,.12);color:var(--mut)">😴 ${R} Rest</span>`:''}
+      <span style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--grn)">${fmt(r.net)}</span>
+    </div>
+  </div>
+  <div class="leg">
+    <div class="legi"><div class="ldot" style="background:var(--grn)"></div>Present</div>
+    <div class="legi"><div class="ldot" style="background:var(--red)"></div>Absent</div>
+    <div class="legi"><div class="ldot" style="background:var(--ylw)"></div>Leave</div>
+    <div class="legi"><div class="ldot" style="background:var(--acc2)"></div>Holiday</div>
+    ${isStaff?'<div class="legi"><div class="ldot" style="background:var(--mut)"></div>Rest (Staff weekly off)</div>':''}
+    <div class="legi" style="border:1px solid rgba(239,68,68,.4);padding:2px 6px;border-radius:4px;"><div class="ldot" style="background:var(--red)"></div>Sunday — Red (click to change)</div>
+    <span style="font-size:10px;color:var(--mut)">· Click any day to cycle</span>
+  </div>
+  <div class="att-cal">${hdrs}${cells}</div>
+  <div style="margin-top:14px;background:var(--surf2);border-radius:10px;padding:14px 18px;">
+    <div style="font-size:10px;color:var(--mut);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px">Salary Calculation — ${am} ${ay}</div>
+    <div style="display:flex;gap:18px;flex-wrap:wrap;font-size:13px;">
+      <div>${isStaff?'Pay Days (30 fixed)':'Days Worked'}: <b style="color:var(--acc)">${r.daysWorked}</b></div>
+      <div>Gross: <b style="color:var(--acc)">${fmt(r.grossWage)}</b> (${r.wagesPerDay}×${r.daysWorked})</div>
+      <div>PF: <b style="color:var(--red)">${fmt(r.pf)}</b></div>
+      <div>ESIC: <b style="color:var(--red)">${fmt(r.esic)}</b></div>
+      <div>Net Pay: <b style="color:var(--grn);font-size:16px">${fmt(r.net)}</b></div>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ── PAY HISTORY ──
+function pageHistory(){
+  const type     = S.histType || 'Worker';
+  const typeEmps = S.employees.filter(e=>(e.empType||'Worker')===type);
+  const typeIcon = type==='Staff'?'👔':'👷';
+  const isStaff  = type==='Staff';
+
+  if(!typeEmps.length) return `
+  <div class="topbar"><div><div class="ptitle">${typeIcon} ${type} Pay History</div></div>${yearSel('histYear',"S.histYear=parseInt(this.value);render()")}</div>
+  <div class="cont">${emptyState('📈',`No ${type}s`,`Add ${type}s first.`)}</div>`;
+
+  const hy   = S.histYear || CUR_Y;
+  const e    = typeEmps[S.histTab] || typeEmps[0];
+  const tabs = typeEmps.slice(0,10).map((em,i)=>`<div class="tab${i===S.histTab?' act':''}" onclick="S.histTab=${i};render()">${ini(em.name)} ${esc(em.name.split(' ')[0]||'')}</div>`).join('');
+
+  // Only completed/current months for selected year
+  const validMonths = MONTHS.filter(m=>isCompletedOrCurrent(m, hy));
+  const rows = validMonths.map(m=>{
+    const r   = calcNetPay(e, m, hy);
+    const cfg = getMonthCfg(e, m, hy);
+    return `<tr>
+    <td style="font-weight:600;font-size:12px">${m}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${fmt(cfg.wagesPerDay||e.wagesPerDay||0)}/day</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--acc)">${r.daysWorked}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px">${fmt(r.grossWage)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--acc)">+${fmt(r.allowances)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ylw)">+${fmt(r.overtime)}</td>
+    ${!isStaff?`<td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--grn)">+${fmt(r.bonus)}</td>`:''}
+    <td style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--red)">${fmt(r.totalDeduct)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--grn)">${fmt(r.net)}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="showPayslip(${e.id},'${m}',${hy})">Slip</button></td></tr>`;
+  }).join('');
+
+  const annual = validMonths.reduce((s,m)=>s+calcNetPay(e,m,hy).net,0);
+
+  return `
+  <div class="topbar">
+    <div><div class="ptitle">${typeIcon} ${type} Pay History</div><div class="psub">Month-wise records · ${hy}</div></div>
+    ${yearSel('histYear',"S.histYear=parseInt(this.value);render()")}
+  </div>
+  <div class="cont">
+  <div class="tabs">${tabs}</div>
+  <div style="background:var(--surf2);border-radius:10px;padding:14px 18px;display:flex;gap:14px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+    <div style="width:44px;height:44px;border-radius:50%;background:${ac(e.id)};display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;border:3px solid var(--acc)">${ini(e.name)}</div>
+    <div><div style="font-size:15px;font-weight:700">${esc(e.name)}</div><div style="color:var(--mut);font-size:11px">${esc(e.dept)} · ${esc(e.empId)} · <span class="badge ${isStaff?'bp':'by'}">${type}</span></div></div>
+    <div style="margin-left:auto;text-align:right">
+      <div style="font-size:10px;color:var(--mut)">Annual Total ${hy}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--grn);font-size:16px">${fmt(annual)}</div>
+    </div>
+  </div>
+  <div class="card"><div class="ch"><div class="ctit">${typeIcon} Salary History — ${hy}</div></div>
+  <div class="tw"><table><thead><tr>
+    <th>Month</th><th>Wage/Day</th><th>Days</th><th>Gross</th>
+    <th>Allow</th><th>OT</th>${!isStaff?'<th>Bonus</th>':''}
+    <th>Deduct</th><th>Net Pay</th><th>Slip</th>
+  </tr></thead><tbody>${rows||`<tr><td colspan="10" style="text-align:center;padding:24px;color:var(--mut)">No records for ${hy} yet</td></tr>`}</tbody></table></div></div>
+  </div>`;
+}
+
+// ── REPORTS ──
+function pageReports(){
+  if(!S.employees.length) return `
+  <div class="topbar"><div><div class="ptitle">Reports</div></div></div>
+  <div class="cont">${emptyState('📋','No data','Add employees first.','Add',"nav('employees')")}</div>`;
+
+  const rm = S.payMonth||MONTHS[PREV_M], ry = S.payYear||PREV_Y;
+  const total = S.employees.reduce((s,e)=>s+calcNetPay(e,rm,ry).net,0);
+  const ae    = S.employees.filter(e=>e.status==='Active');
+
+  const deptCards = ["Engineering","HR","Finance","Operations","Marketing","Sales","Administration","IT","Legal"].map(dept=>{
+    const de=S.employees.filter(e=>e.dept===dept); if(!de.length) return '';
+    const tn=de.reduce((s,e)=>s+calcNetPay(e,rm,ry).net,0);
+    const rows=de.map(e=>{
+      const r=calcNetPay(e,rm,ry);
+      return `<tr>
+      <td style="font-weight:600">${esc(e.name)}</td>
+      <td style="font-size:11px;color:var(--mut)">${esc(e.role)}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(e.wagesPerDay||0)}/day</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--acc)">${r.daysWorked}</td>
+      <td style="font-family:'JetBrains Mono',monospace">${fmt(r.grossWage)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--red)">${fmt(r.totalDeduct)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--grn)">${fmt(r.net)}</td>
+      <td><button class="btn btn-grn btn-sm" onclick="printSlip(${e.id},'${rm}',${ry})">🖨️</button></td></tr>`;
+    }).join('');
+    return `<div class="card"><div class="ch">
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge bp">${dept}</span><span style="font-size:11px;color:var(--mut)">${de.length} emp</span></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--grn)">${fmt(tn)}</div>
+    </div><div class="tw"><table><thead><tr><th>Name</th><th>Role</th><th>Wage</th><th>Days</th><th>Gross</th><th>Deduct</th><th>Net</th><th>Slip</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }).join('');
+
+  return `
+  <div class="topbar"><div><div class="ptitle">Reports</div><div class="psub">${rm} ${ry}</div></div>
+  <div class="tright">
+    <select class="dsel" onchange="S.payMonth=this.value;render()">${MONTHS.filter(m=>isCompletedOrCurrent(m,ry)).map(m=>`<option${m===rm?' selected':''}>${m}</option>`).join('')}</select>
+    ${yearSel('payYear',"S.payYear=parseInt(this.value);render()")}
+  </div></div>
+  <div class="cont">
+  <div class="sgrid">
+    <div class="scard g"><div class="slbl">Net Payroll</div><div class="sval g">${fmt(total)}</div><div class="ssub">${rm} ${ry}</div></div>
+    <div class="scard b"><div class="slbl">Avg Net Pay</div><div class="sval b">${fmt(S.employees.length?Math.round(total/S.employees.length):0)}</div><div class="ssub">Per employee</div></div>
+    <div class="scard p"><div class="slbl">Active Staff</div><div class="sval p">${ae.length}</div><div class="ssub">of ${S.employees.length} total</div></div>
+  </div>
+  ${deptCards}
+  </div>`;
+}
+
+// ── ADMIN ──
+function pageAdmin(){
+  const photoSrc = S.profile.photo||'';
+  const dispName = S.profile.name||'Administrator';
+  return `
+  <div class="topbar"><div><div class="ptitle">Admin Panel</div><div class="psub">System settings</div></div></div>
+  <div class="cont">
+
+  <!-- Profile -->
+  <div class="card" style="margin-bottom:14px;">
+    <div class="ch"><div class="ctit">👤 Login Profile</div></div>
+    <div style="padding:22px;">
+      <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div class="photo-preview" onclick="document.getElementById('photo-inp').click()">
+            ${photoSrc?`<img src="${esc(photoSrc)}"/>`:`<span style="font-size:32px;color:var(--mut)">👤</span>`}
+          </div>
+          <input type="file" id="photo-inp" accept="image/*" style="display:none" onchange="handlePhotoUpload(event)"/>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('photo-inp').click()">📷 Upload</button>
+          ${photoSrc?`<button class="btn btn-red btn-sm" onclick="removePhoto()">Remove</button>`:''}
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div class="slbl2">Display Name</div>
+          <div class="field"><label>Name on login screen</label><input id="new-display-name" value="${esc(dispName)}" placeholder="Your name"/></div>
+          <button class="btn btn-acc" onclick="saveDisplayName()">Save Name</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-grid" style="margin-bottom:14px;">
+    <div class="admin-card">
+      <div class="admin-card-title">🔑 Change Username</div>
+      <div class="admin-card-sub">Update login username</div>
+      <div class="field"><label>Current Username</label><input id="cur-user" placeholder="Current username"/></div>
+      <div class="field"><label>New Username</label><input id="new-user" placeholder="New username"/></div>
+      <div class="field"><label>Confirm with Password</label><input id="conf-pass-u" type="password" placeholder="Current password"/></div>
+      <button class="btn btn-acc" onclick="changeUsername()">Update Username</button>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-title">🔒 Change Password</div>
+      <div class="admin-card-sub">Update login password</div>
+      <div class="field"><label>Current Password</label><input id="cur-pass" type="password" placeholder="Current password"/></div>
+      <div class="field"><label>New Password</label><input id="new-pass" type="password" placeholder="Min 6 chars"/></div>
+      <div class="field"><label>Confirm New</label><input id="new-pass2" type="password" placeholder="Repeat"/></div>
+      <button class="btn btn-acc" onclick="changePassword()">Update Password</button>
+    </div>
+  </div>
+  <div class="admin-grid" style="margin-bottom:14px;">
+    <div class="admin-card">
+      <div class="admin-card-title">💾 Data Transfer</div>
+      <div class="admin-card-sub">Export all data to transfer between systems safely</div>
+      <button class="btn btn-acc" style="margin-bottom:10px;width:100%;justify-content:center;" onclick="exportData()">⬇️ Export All Data</button>
+      <div class="field"><label>Import Data</label><input type="file" id="import-inp" accept=".json" onchange="importData(event)" style="font-size:12px;padding:8px;"/></div>
+      <div style="font-size:10px;color:var(--mut);margin-top:4px">Export creates a .json backup. Import merges data safely — existing records are not deleted.</div>
+    </div>
+    <div class="admin-card">
+      <div class="admin-card-title">⚙️ System Info</div>
+      <div class="admin-card-sub">Current system status</div>
+      ${[['Application','Web Payroll System (KLEP)'],['Version','V 7.0'],
+         ['Workers',S.employees.filter(e=>(e.empType||'Worker')==='Worker').length+' records'],
+         ['Staff',S.employees.filter(e=>e.empType==='Staff').length+' records'],
+         ['Login User', S.creds.user],['Storage','Browser localStorage'],
+        ].map(([k,v])=>`<div class="info-row"><span style="color:var(--mut);font-size:11px">${k}</span><span style="font-weight:600;font-size:11px">${esc(String(v))}</span></div>`).join('')}
+    </div>
+  </div>
+
+  <div class="card" style="border-color:rgba(239,68,68,.25);margin-top:14px;">
+    <div class="ch" style="border-color:rgba(239,68,68,.2);"><div class="ctit" style="color:var(--red)">⚠️ Danger Zone</div></div>
+    <div style="padding:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div><div style="font-size:13px;font-weight:600">Clear All Data</div><div style="font-size:11px;color:var(--mut)">Delete all employee and payroll records permanently.</div></div>
+      <button class="btn btn-red" onclick="clearAllData()">Clear All</button>
+    </div>
+  </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════
+//  EMPLOYEE CRUD
+// ════════════════════════════════════════════════════
+let _editId=null, _editDraft={};
+
+function openAdd(){
+  const nextId  = S.employees.length ? Math.max(...S.employees.map(e=>e.id))+1 : 1;
+  const defType = S.empTab || 'Worker';
+  _editId=null;
+  _editDraft={id:nextId, empId:'EMP'+String(S.employees.length+1).padStart(3,'0'),
+    name:'', dept:'Operations', role: defType==='Worker'?'Associate':'Executive',
+    wagesPerDay:'', allowances:'', overtime:'', bonus:'',
+    status:'Active', join:'', phone:'', email:'',
+    weeklyOff:[0], empType: defType};
+  showEditModal();
+}
+
+function openEdit(id){
+  _editId=id;
+  _editDraft={...S.employees.find(e=>e.id===id)};
+  if(!_editDraft.weeklyOff) _editDraft.weeklyOff=[0];
+  if(!_editDraft.empType)   _editDraft.empType='Worker';
+  showEditModal();
+}
+
+function onTypeChange(type){
+  _editDraft.empType = type;
+  _editDraft.role    = type==='Worker' ? 'Associate' : 'Executive';
+  // Re-render role dropdown and bonus field
+  const rd = document.getElementById('role-dropdown');
+  const bf = document.getElementById('bonus-field-wrap');
+  const cp = document.getElementById('calc-preview-lbl');
+  if(rd){
+    const roles = type==='Worker' ? WORKER_ROLES : STAFF_ROLES;
+    rd.innerHTML = roles.map(r=>`<option${r===_editDraft.role?' selected':''}>${r}</option>`).join('');
+  }
+  if(bf) bf.style.display = type==='Worker' ? '' : 'none';
+  if(cp) cp.textContent = type==='Worker' ? 'Preview (26 days)' : 'Preview (30 days)';
+  updCalc();
+}
+
+function toggleWD(dow){
+  const cur = _editDraft.weeklyOff||[0];
+  if(cur.includes(dow)) _editDraft.weeklyOff=cur.filter(d=>d!==dow);
+  else _editDraft.weeklyOff=[...cur,dow];
+  const container=document.getElementById('wday-container');
+  if(container) container.innerHTML=renderWdayPicker(_editDraft.weeklyOff);
+  updCalc();
+}
+
+function renderWdayPicker(offDays){
+  return DOW_LBL.map((d,i)=>`<button class="wday-btn${offDays.includes(i)?' on':''}" onclick="toggleWD(${i})">${d}</button>`).join('');
+}
+
+function updCalc(){
+  const wages   = parseFloat(_editDraft.wagesPerDay)||0;
+  const allow   = parseFloat(_editDraft.allowances)||0;
+  const ot      = parseFloat(_editDraft.overtime)||0;
+  const isStaff = (_editDraft.empType||'Worker')==='Staff';
+  const payDays = isStaff ? 30 : 26;
+  const {pf,esic,total,grossWage} = calcDeductions(wages,allow,ot,payDays);
+  const bonus   = isStaff ? 0 : (parseFloat(_editDraft.bonus)||0);
+  const net     = grossWage+allow+ot+bonus-total;
+  const gEl=document.getElementById('calc-gross');
+  const pEl=document.getElementById('calc-pf');
+  const nEl=document.getElementById('calc-net');
+  if(gEl) gEl.textContent=`₹${grossWage.toLocaleString('en-IN')} (${wages}×${payDays})`;
+  if(pEl) pEl.textContent=`PF:₹${pf.toLocaleString('en-IN')} + ESIC:₹${esic.toLocaleString('en-IN')} = ₹${total.toLocaleString('en-IN')}`;
+  if(nEl) nEl.textContent=fmt(Math.max(0,net));
+}
+
+function upd(k,v){ _editDraft[k]=v; updCalc(); }
+
+function showEditModal(){
+  const d       = _editDraft, isAdd=!_editId;
+  const wo      = d.weeklyOff||[0];
+  const type    = d.empType||'Worker';
+  const isStaff = type==='Staff';
+  const roles   = isStaff ? STAFF_ROLES : WORKER_ROLES;
+  const depts   = ["Operations","Engineering","HR","Finance","Marketing","Sales","Administration","IT","Legal"];
+
+  modal(`<div class="ovl" onclick="if(event.target.className==='ovl')closeModal()">
+  <div class="modal lg">
+    <div class="mh">
+      <div class="mtit">${isAdd?'Add Employee':'Edit Employee'}</div>
+      <button class="xbtn" onclick="closeModal()">×</button>
+    </div>
+    <div class="mb">
+
+      <!-- Type selector -->
+      <div class="slbl2">Employee Type</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <button class="btn ${type==='Worker'?'btn-ylw':'btn-ghost'}" onclick="onTypeChange('Worker')">👷 Worker</button>
+        <button class="btn ${type==='Staff'?'btn-pur':'btn-ghost'}" onclick="onTypeChange('Staff')">👔 Staff</button>
+      </div>
+      <div style="font-size:11px;color:var(--mut);margin-bottom:14px;padding:8px 12px;background:var(--surf2);border-radius:6px;">
+        ${isStaff
+          ? '👔 <b>Staff</b>: Pay based on 30 days fixed · No bonus · Roles: Executive, Manager, CEO etc. · Weekly off = Rest day'
+          : '👷 <b>Worker</b>: Pay based on attendance (days present) · Bonus eligible · Role: Associate · Weekly off = unpaid'}
+      </div>
+
+      <div class="slbl2">Personal Info</div>
+      <div class="fgrid">
+        <div class="field full"><label>Full Name *</label><input value="${esc(d.name)}" oninput="upd('name',this.value)" placeholder="Full name"/></div>
+        <div class="field"><label>Employee ID *</label><input value="${esc(d.empId)}" oninput="upd('empId',this.value)"/></div>
+        <div class="field"><label>Date of Joining</label><input type="date" value="${esc(d.join||'')}" oninput="upd('join',this.value)"/></div>
+        <div class="field"><label>Department *</label>
+          <select oninput="upd('dept',this.value)">${depts.map(x=>`<option${d.dept===x?' selected':''}>${x}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Designation *</label>
+          <select id="role-dropdown" oninput="upd('role',this.value)">${roles.map(r=>`<option${d.role===r?' selected':''}>${r}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>Phone</label><input value="${esc(d.phone||'')}" oninput="upd('phone',this.value)" placeholder="9876543210"/></div>
+        <div class="field"><label>Email</label><input value="${esc(d.email||'')}" oninput="upd('email',this.value)" placeholder="name@company.com"/></div>
+        <div class="field"><label>Status</label>
+          <select oninput="upd('status',this.value)"><option${d.status==='Active'?' selected':''}>Active</option><option${d.status==='Inactive'?' selected':''}>Inactive</option></select>
+        </div>
+      </div>
+
+      <div class="div"></div>
+      <div class="slbl2">Weekly Off</div>
+      <div style="font-size:11px;color:var(--mut);margin-bottom:8px">
+        ${isStaff ? 'Staff weekly off day will show as 😴 Rest — markable as Present/Rest/Absent.' : 'Worker weekly off day = unpaid 🔴. Cannot be marked as Present.'}
+      </div>
+      <div id="wday-container" class="wday-pick">${renderWdayPicker(wo)}</div>
+
+      <div class="div"></div>
+      <div class="slbl2">Salary</div>
+      <div class="fgrid">
+        <div class="field"><label>Daily Wages (₹) *</label><input type="number" value="${esc(d.wagesPerDay||'')}" oninput="upd('wagesPerDay',this.value)" placeholder="e.g. 500"/></div>
+        <div class="field"><label>Monthly Allowances</label><input type="number" value="${esc(d.allowances||0)}" oninput="upd('allowances',this.value)"/></div>
+        <div class="field"><label>Overtime</label><input type="number" value="${esc(d.overtime||0)}" oninput="upd('overtime',this.value)"/></div>
+        <div id="bonus-field-wrap" class="field" style="display:${isStaff?'none':''};">
+          <label>Bonus <span style="font-size:9px;color:var(--mut)">(Workers only)</span></label>
+          <input type="number" value="${esc(d.bonus||0)}" oninput="upd('bonus',this.value)"/>
+        </div>
+      </div>
+      <div class="psbox" style="margin-top:8px">
+        <div class="slbl2" style="margin-bottom:8px"><span id="calc-preview-lbl">${isStaff?'Preview (30 days fixed)':'Preview (26 working days)'}</span></div>
+        <div class="prow"><span>Gross Salary</span><span id="calc-gross" style="font-family:'JetBrains Mono',monospace;color:var(--acc)">—</span></div>
+        <div class="prow"><span>PF + ESIC (Govt.)</span><span id="calc-pf" style="font-family:'JetBrains Mono',monospace;color:var(--red)">—</span></div>
+        <div class="ptot"><span>Est. Net Pay</span><span id="calc-net" style="font-family:'JetBrains Mono',monospace">—</span></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-acc" onclick="saveEmp()">${isAdd?'Add Employee':'Save Changes'}</button>
+    </div>
+  </div></div>`);
+  setTimeout(updCalc, 50);
+}
+
+function saveEmp(){
+  const d=_editDraft;
+  if(!d.name||!d.empId||!d.dept||!d.role||!d.wagesPerDay){toast('Fill all required fields.','e');return;}
+  const isStaff = (d.empType||'Worker')==='Staff';
+  const parsed={...d,
+    empType:   d.empType||'Worker',
+    wagesPerDay:parseFloat(d.wagesPerDay)||0,
+    allowances: parseFloat(d.allowances)||0,
+    overtime:   parseFloat(d.overtime)||0,
+    bonus:      isStaff ? 0 : (parseFloat(d.bonus)||0),
+    weeklyOff:  d.weeklyOff||[0]
+  };
+  if(!_editId){
+    S.employees.push(parsed);
+    toast(`${isStaff?'👔 Staff':'👷 Worker'} added!`);
+  } else {
+    S.employees=S.employees.map(e=>e.id===_editId?parsed:e);
+    toast('Employee updated!');
+  }
+  DB.save(); closeModal(); render();
+}
+
+function openDel(id){
+  const e=S.employees.find(x=>x.id===id); if(!e) return;
+  modal(`<div class="ovl" onclick="if(event.target.className==='ovl')closeModal()">
+  <div class="modal sm">
+    <div class="mh"><div class="mtit">Remove Employee</div><button class="xbtn" onclick="closeModal()">×</button></div>
+    <div class="mb"><p style="color:var(--mut);line-height:1.7;font-size:13px">Remove <strong style="color:var(--txt)">${esc(e.name)}</strong> (${esc(e.empId)}) permanently? This cannot be undone.</p></div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-red" onclick="delEmp(${id})">Remove</button>
+    </div>
+  </div></div>`);
+}
+
+function delEmp(id){
+  S.employees=S.employees.filter(e=>e.id!==id);
+  DB.save(); closeModal(); toast('Employee removed.','w'); render();
+}
+
+// ── MONTH ENTRY MODAL ──
+function openMonthEntry(empId, month, year){
+  const e   = S.employees.find(x=>x.id===empId); if(!e) return;
+  const cfg = getMonthCfg(e, month, year);
+  modal(`<div class="ovl" onclick="if(event.target.className==='ovl')closeModal()">
+  <div class="modal sm">
+    <div class="mh"><div class="mtit">⚙️ ${month} ${year} — ${esc(e.name)}</div><button class="xbtn" onclick="closeModal()">×</button></div>
+    <div class="mb">
+      <div style="font-size:11px;color:var(--mut);margin-bottom:14px">Configure salary components for this specific month. Changes apply only to ${month} ${year}.</div>
+      <div class="field"><label>Daily Wages (₹)</label><input type="number" id="me-wages" value="${cfg.wagesPerDay||e.wagesPerDay||0}"/></div>
+      <div class="field"><label>Allowances</label><input type="number" id="me-allow" value="${cfg.allowances||e.allowances||0}"/></div>
+      <div class="field"><label>Overtime</label><input type="number" id="me-ot" value="${cfg.overtime||e.overtime||0}"/></div>
+      <div class="field"><label>Bonus</label><input type="number" id="me-bonus" value="${cfg.bonus||e.bonus||0}"/></div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-acc" onclick="saveMonthEntry(${empId},'${month}',${year})">Save for ${month}</button>
+    </div>
+  </div></div>`);
+}
+
+function saveMonthEntry(empId, month, year){
+  saveMonthCfg(empId, month, year, {
+    wagesPerDay: parseFloat(document.getElementById('me-wages').value)||0,
+    allowances:  parseFloat(document.getElementById('me-allow').value)||0,
+    overtime:    parseFloat(document.getElementById('me-ot').value)||0,
+    bonus:       parseFloat(document.getElementById('me-bonus').value)||0,
+  });
+  toast(`${month} ${year} config saved!`);
+  closeModal(); render();
+}
+
+// ── PROFILE MODAL ──
+function showProfile(id){
+  const e  = S.employees.find(x=>x.id===id); if(!e) return;
+  const r  = calcNetPay(e, MONTHS[PREV_M], PREV_Y);
+  const wo = getWeeklyOff(e).map(d=>DOW_LBL[d]).join(', ');
+  modal(`<div class="ovl" onclick="if(event.target.className==='ovl')closeModal()">
+  <div class="modal sm">
+    <div class="mh"><div class="mtit">Employee Profile</div><button class="xbtn" onclick="closeModal()">×</button></div>
+    <div class="mb">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="width:70px;height:70px;border-radius:50%;background:${ac(e.id)};display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;margin:0 auto 10px;border:4px solid var(--acc)">${ini(e.name)}</div>
+        <div style="font-size:18px;font-weight:700">${esc(e.name)}</div>
+        <div style="color:var(--mut);font-size:12px;margin-top:2px">${esc(e.role)}</div>
+        <span class="badge ${e.status==='Active'?'bg':'br'}" style="margin-top:6px;display:inline-block">${esc(e.status)}</span>
+      </div>
+      ${[['Department',e.dept],['Employee ID',e.empId],['Joined',e.join||'—'],['Phone',e.phone||'—'],['Email',e.email||'—'],['Daily Wage',fmt(e.wagesPerDay||0)+'/day'],['Weekly Off',wo]].map(([k,v])=>`<div class="info-row"><span style="color:var(--mut)">${k}</span><span style="font-weight:600">${esc(v)}</span></div>`).join('')}
+      <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:12px;margin-top:12px;display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:10px;color:var(--mut);text-transform:uppercase;letter-spacing:1px">Last Month Net Pay</div><div style="font-size:10px;color:var(--mut);margin-top:1px">${MONTHS[PREV_M]} ${PREV_Y} · ${r.daysWorked} days</div></div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;color:var(--grn)">${fmt(r.net)}</div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+      <button class="btn btn-grn" onclick="closeModal();openEdit(${e.id})">Edit</button>
+      <button class="btn btn-acc" onclick="closeModal();showPayslip(${e.id},'${MONTHS[PREV_M]}',${PREV_Y})">View Slip</button>
+    </div>
+  </div></div>`);
+}
+
+// ── PAYSLIP MODAL ──
+function showPayslip(id, month, year){
+  const e       = S.employees.find(x=>x.id===id); if(!e) return;
+  const m       = month || MONTHS[PREV_M];
+  const y       = parseInt(year)||PREV_Y;
+  const r       = calcNetPay(e, m, y);
+  const isStaff = (e.empType||'Worker')==='Staff';
+  const mOpts   = MONTHS.filter(mo=>isCompletedOrCurrent(mo,y)).map(mo=>`<option value="${mo}"${mo===m?' selected':''}>${mo}</option>`).join('');
+  const yOpts   = [2024,2025,CUR_Y,CUR_Y+1].filter((v,i,a)=>a.indexOf(v)===i).map(yr=>`<option value="${yr}"${yr===y?' selected':''}>${yr}</option>`).join('');
+  modal(`<div class="ovl" onclick="if(event.target.className==='ovl')closeModal()">
+  <div class="modal">
+    <div class="mh">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span>${isStaff?'👔':'👷'}</span>
+        <div class="mtit">Salary Slip — ${esc(e.name)}</div>
+      </div>
+      <button class="xbtn" onclick="closeModal()">×</button>
+    </div>
+    <div class="mb">
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;background:var(--surf2);padding:10px 12px;border-radius:8px;flex-wrap:wrap;">
+        <span style="font-size:10px;color:var(--mut);letter-spacing:1px;text-transform:uppercase">Month:</span>
+        <select class="dsel" style="padding:5px 8px;font-size:12px;" onchange="showPayslip(${e.id},this.value,document.getElementById('sy-${e.id}').value)">${mOpts}</select>
+        <select id="sy-${e.id}" class="ysel" onchange="showPayslip(${e.id},document.querySelector('.ovl .dsel').value,this.value)">${yOpts}</select>
+        <span class="badge ${isStaff?'bp':'by'}">${isStaff?'Staff · 30 days':'Worker · Att. based'}</span>
+      </div>
+      <div class="psbox">
+        <div class="slbl2">Earnings — ${m} ${y}</div>
+        <div class="prow"><span>${isStaff?'Daily Wage × 30 days (fixed)':'Daily Wage × Days Present'}</span><span style="font-size:11px;color:var(--mut)">${fmt(r.wagesPerDay)}/day × ${r.daysWorked} days</span></div>
+        <div class="prow"><span>Gross Salary</span><span style="font-family:'JetBrains Mono',monospace;color:var(--grn)">+ ${fmt(r.grossWage)}</span></div>
+        <div class="prow"><span>Allowances</span><span style="font-family:'JetBrains Mono',monospace;color:var(--grn)">+ ${fmt(r.allowances)}</span></div>
+        <div class="prow"><span>Overtime</span><span style="font-family:'JetBrains Mono',monospace;color:var(--grn)">+ ${fmt(r.overtime)}</span></div>
+        ${!isStaff?`<div class="prow"><span>Bonus</span><span style="font-family:'JetBrains Mono',monospace;color:var(--grn)">+ ${fmt(r.bonus)}</span></div>`:''}
+        <div style="height:1px;background:var(--bord);margin:10px 0"></div>
+        <div class="prow"><b>Total Earnings</b><b style="font-family:'JetBrains Mono',monospace">${fmt(r.totalGross+(isStaff?0:r.bonus))}</b></div>
+        <div style="height:1px;background:var(--bord);margin:10px 0"></div>
+        <div class="slbl2">Deductions (Govt. Rules)</div>
+        <div class="prow"><span>PF — 12% of Gross</span><span style="font-family:'JetBrains Mono',monospace;color:var(--red)">− ${fmt(r.pf)}</span></div>
+        <div class="prow"><span>ESIC — 0.75%${r.totalGross>21000?' (N/A)':''}</span><span style="font-family:'JetBrains Mono',monospace;color:var(--red)">− ${fmt(r.esic)}</span></div>
+        <div style="height:1px;background:var(--bord);margin:10px 0"></div>
+        <div class="ptot"><span>NET PAY</span><span style="font-family:'JetBrains Mono',monospace">${fmt(r.net)}</span></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn btn-ghost" onclick="closeModal()">Close</button>
+      <button class="btn btn-grn" onclick="printSlip(${e.id},'${m}',${y})">🖨️ Print / PDF</button>
+    </div>
+  </div></div>`);
+}
+
+// ── PRINT SLIP ──
+function printSlip(id, month, year){
+  const e = S.employees.find(x=>x.id===id); if(!e) return;
+  const m = month||MONTHS[PREV_M], y = parseInt(year)||PREV_Y;
+  const r = calcNetPay(e, m, y);
+  const w = window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><title>Salary Slip</title>
+  <style>*{box-sizing:border-box;margin:0;padding:0;}body{font-family:'Segoe UI',Arial,sans-serif;padding:32px;color:#111;max-width:640px;margin:auto;}
+  .header{text-align:center;margin-bottom:18px;padding-bottom:14px;border-bottom:2px solid #e5e7eb;}
+  .company{font-size:20px;font-weight:700;}.doc-title{font-size:11px;color:#6b7280;letter-spacing:2px;text-transform:uppercase;margin-top:4px;}.period{font-size:12px;color:#6b7280;margin-top:2px;}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:18px;overflow:hidden;}
+  .info-cell{padding:10px 13px;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;}.info-cell:nth-child(even){border-right:none;}.info-cell:nth-last-child(-n+2){border-bottom:none;}
+  .info-lbl{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#9ca3af;margin-bottom:2px;}.info-val{font-size:13px;font-weight:600;}
+  table{width:100%;border-collapse:collapse;margin-bottom:14px;}thead{background:#f3f4f6;}th{padding:8px 11px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;color:#6b7280;}
+  td{padding:8px 11px;font-size:13px;border-bottom:1px solid #f3f4f6;}.amount{text-align:right;font-family:'Courier New',monospace;}.red{color:#dc2626;}.grn{color:#059669;font-weight:700;}
+  .total-row td{font-size:15px;font-weight:700;color:#059669;border-top:2px solid #e5e7eb;padding-top:11px;}
+  .footer{text-align:center;font-size:11px;color:#9ca3af;margin-top:18px;padding-top:12px;border-top:1px solid #e5e7eb;}
+  .print-btn{display:block;margin:14px auto 0;padding:9px 22px;background:#0284c7;color:#fff;border:none;border-radius:7px;font-size:13px;cursor:pointer;font-weight:600;}
+  @media print{.print-btn{display:none;}}</style></head><body>
+  <div class="header"><div class="company">Web Payroll System</div><div class="doc-title">Official Salary Slip</div><div class="period">${esc(m)} ${y}</div></div>
+  <div class="info-grid">
+    <div class="info-cell"><div class="info-lbl">Employee</div><div class="info-val">${esc(e.name)}</div></div>
+    <div class="info-cell"><div class="info-lbl">ID</div><div class="info-val">${esc(e.empId)}</div></div>
+    <div class="info-cell"><div class="info-lbl">Department</div><div class="info-val">${esc(e.dept)}</div></div>
+    <div class="info-cell"><div class="info-lbl">Designation</div><div class="info-val">${esc(e.role)}</div></div>
+  </div>
+  <table><thead><tr><th>Description</th><th class="amount">Amount (₹)</th></tr></thead><tbody>
+    <tr><td>Daily Wage Rate</td><td class="amount">₹${(r.wagesPerDay||0).toLocaleString('en-IN')} / day</td></tr>
+    <tr><td>Days Worked</td><td class="amount">${r.daysWorked} days</td></tr>
+    <tr><td>Gross Salary (${r.wagesPerDay} × ${r.daysWorked})</td><td class="amount">${r.grossWage.toLocaleString('en-IN')}</td></tr>
+    <tr><td>Allowances (HRA+TA+DA)</td><td class="amount">+${r.allowances.toLocaleString('en-IN')}</td></tr>
+    <tr><td>Overtime</td><td class="amount">+${r.overtime.toLocaleString('en-IN')}</td></tr>
+    <tr><td>Bonus</td><td class="amount">+${r.bonus.toLocaleString('en-IN')}</td></tr>
+    <tr style="background:#f9fafb"><td><strong>Total Earnings</strong></td><td class="amount"><strong>${(r.totalGross+r.bonus).toLocaleString('en-IN')}</strong></td></tr>
+    <tr><td class="red">PF — 12% of Gross (Govt.)</td><td class="amount red">− ${r.pf.toLocaleString('en-IN')}</td></tr>
+    <tr><td class="red">ESIC — 0.75%${r.totalGross>21000?' (N/A: >₹21k)':''}</td><td class="amount red">− ${r.esic.toLocaleString('en-IN')}</td></tr>
+  </tbody><tfoot><tr class="total-row"><td>NET PAY</td><td class="amount">₹ ${r.net.toLocaleString('en-IN')}</td></tr></tfoot></table>
+  <div class="footer">Generated by Web Payroll System · ${new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'})}<br><em>Computer-generated document.</em></div>
+  <button class="print-btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+  </body></html>`);
+  w.document.close();
+}
+
+// ── GOTO ATTENDANCE ──
+function gotoAtt(id){ S.selEmpAtt=id; nav('attendance'); }
+
+// ════════════════════════════════════════════════════
+//  ADMIN ACTIONS
+// ════════════════════════════════════════════════════
+function handlePhotoUpload(event){
+  const file=event.target.files[0]; if(!file) return;
+  if(file.size>2*1024*1024){toast('Max 2MB allowed.','e');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    S.profile.photo=e.target.result; DB.save();
+    const avI=document.getElementById('u-avt-img'), av=document.getElementById('u-avt');
+    if(avI){avI.src=S.profile.photo;avI.style.display='block';} if(av) av.style.fontSize='0';
+    toast('Photo updated!'); render();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(){
+  S.profile.photo=''; DB.save();
+  const avI=document.getElementById('u-avt-img'), av=document.getElementById('u-avt');
+  if(avI) avI.style.display='none'; if(av){av.style.fontSize='';av.textContent=(S.profile.name||'A')[0].toUpperCase();}
+  toast('Photo removed.','w'); render();
+}
+
+function saveDisplayName(){
+  const n=document.getElementById('new-display-name').value.trim();
+  if(!n){toast('Name required.','e');return;}
+  S.profile.name=n; DB.save();
+  const nm=document.getElementById('u-nm'); if(nm) nm.textContent=n;
+  toast('Name updated!'); render();
+}
+
+function changeUsername(){
+  const cur=document.getElementById('cur-user').value.trim();
+  const nw =document.getElementById('new-user').value.trim();
+  const cp =document.getElementById('conf-pass-u').value;
+  if(!cur||!nw||!cp){toast('All fields required.','e');return;}
+  if(cur!==S.creds.user){toast('Current username is incorrect.','e');return;}
+  if(cp!==S.creds.pass){toast('Password confirmation is wrong.','e');return;}
+  if(nw.length<3){toast('Min 3 characters.','e');return;}
+  S.creds.user=nw; DB.save();
+  const nm=document.getElementById('u-nm'); if(nm) nm.textContent=nw;
+  toast('Username updated to: '+nw); render();
+}
+
+function changePassword(){
+  const c=document.getElementById('cur-pass').value, n=document.getElementById('new-pass').value, n2=document.getElementById('new-pass2').value;
+  if(!c||!n||!n2){toast('All fields required.','e');return;}
+  if(c!==S.creds.pass){toast('Current password wrong.','e');return;}
+  if(n.length<6){toast('Min 6 characters.','e');return;}
+  if(n!==n2){toast('Passwords do not match.','e');return;}
+  S.creds.pass=n; DB.save(); toast('Password updated!'); render();
+}
+
+// ── EXPORT / IMPORT (Data Transfer) ──
+function exportData(){
+  const data={
+    employees: S.employees,
+    attendance: S.attendance,
+    monthData: S.monthData,
+    payHistory: S.payHistory,
+    profile: S.profile,
+    settings: S.settings,
+    exportedAt: new Date().toISOString(),
+    version: 'WPS_V6'
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`PayrollData_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.json`;
+  a.click(); URL.revokeObjectURL(url);
+  toast('Data exported successfully!');
+}
+
+function importData(event){
+  const file=event.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    try{
+      const data=JSON.parse(e.target.result);
+      if(!data.employees){toast('Invalid backup file.','e');return;}
+      if(!confirm(`Import ${data.employees.length} employees from backup? Existing data will be merged.`)) return;
+      // MERGE — don't delete existing, add new ones
+      data.employees.forEach(imp=>{
+        const exists=S.employees.find(x=>x.empId===imp.empId||x.id===imp.id);
+        if(!exists) S.employees.push(imp);
+        // else update
+        else { const idx=S.employees.findIndex(x=>x.id===exists.id); if(idx>=0) S.employees[idx]={...exists,...imp,id:exists.id}; }
+      });
+      // Merge attendance + monthData
+      if(data.attendance) Object.assign(S.attendance, data.attendance);
+      if(data.monthData)  Object.assign(S.monthData,  data.monthData);
+      if(data.payHistory) Object.assign(S.payHistory, data.payHistory);
+      DB.save(); toast(`Imported ${data.employees.length} employees successfully!`); render();
+    } catch(err){ toast('Error reading file: '+err.message,'e'); }
+  };
+  reader.readAsText(file);
+}
+
+function clearAllData(){
+  if(!confirm('Delete ALL employee and payroll data? This cannot be undone.')) return;
+  S.employees=[]; S.attendance={}; S.monthData={}; S.payHistory={};
+  DB.save(); toast('All data cleared.','w'); render();
+}
+
+// ════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════
+applyTheme();
+updateLoginProfile();
+</script>
+</body>
+</html>
